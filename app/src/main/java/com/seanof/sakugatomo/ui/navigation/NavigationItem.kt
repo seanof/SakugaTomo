@@ -1,4 +1,4 @@
-package com.seanof.sakugatomo.ui
+package com.seanof.sakugatomo.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -21,25 +21,25 @@ data class NavigationItem(
         val items = listOf(
             NavigationItem(
                 title = "Latest Posts",
-                route = Screen.Latest.route,
+                route = ScreenRoute.Latest.route,
                 selectedIcon = Icons.Filled.Home,
                 unselectedIcon = Icons.Outlined.Home
             ),
             NavigationItem(
                 title = "Liked Posts",
-                route = Screen.Liked.route,
+                route = ScreenRoute.Liked.route,
                 selectedIcon = Icons.Filled.ThumbUp,
                 unselectedIcon = Icons.Outlined.ThumbUp
             ),
             NavigationItem(
                 title = "Popular Posts",
-                route = Screen.Popular.route,
+                route = ScreenRoute.Popular.route,
                 selectedIcon = Icons.Filled.Star,
                 unselectedIcon = Icons.Outlined.Star
             ),
             NavigationItem(
                 title = "Search Posts",
-                route = Screen.Search.route,
+                route = ScreenRoute.Search.route,
                 selectedIcon = Icons.Filled.Search,
                 unselectedIcon = Icons.Outlined.Search
             )

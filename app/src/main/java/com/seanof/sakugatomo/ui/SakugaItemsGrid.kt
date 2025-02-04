@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.data.remote.SakugaApiResult
+import com.seanof.sakugatomo.ui.navigation.ScreenRoute
 import com.seanof.sakugatomo.util.Const.DEFAULT_ERROR_MSG
 
 @Composable
@@ -47,15 +48,14 @@ fun SakugaItemsGrid(
         ) {
             when (apiResult) {
                 is SakugaApiResult.Loading -> CircularProgressIndicator(
-                    modifier = Modifier.size(
-                        50.dp
-                    ), color = Color.Blue
+                    modifier = Modifier.size(50.dp),
+                    color = Color.Blue
                 )
                 is SakugaApiResult.Error -> Text(DEFAULT_ERROR_MSG)
                 is SakugaApiResult.Success -> {
                     getLikedSakugaPost.invoke(apiResult.data, likedPosts)
                     val postList =
-                        if (currentRoute == Screen.Liked.route) likedPosts else apiResult.data
+                        if (currentRoute == ScreenRoute.Liked.route) likedPosts else apiResult.data
                             ?: emptyList()
 
                     if (postList.isNotEmpty()) {

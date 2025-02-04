@@ -1,4 +1,4 @@
-package com.seanof.sakugatomo
+package com.seanof.sakugatomo.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -51,9 +51,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.seanof.sakugatomo.ui.NavigationItem
-import com.seanof.sakugatomo.ui.NavigationStack
-import com.seanof.sakugatomo.ui.Screen
+import com.seanof.sakugatomo.R
+import com.seanof.sakugatomo.SakugaTomoViewModel
+import com.seanof.sakugatomo.ui.navigation.NavigationItem
+import com.seanof.sakugatomo.ui.navigation.NavigationStack
+import com.seanof.sakugatomo.ui.navigation.ScreenRoute
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -75,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 var currentRoute by remember {
-                    mutableStateOf(Screen.Latest.route)
+                    mutableStateOf(ScreenRoute.Latest.route)
                 }
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
@@ -93,9 +95,14 @@ class MainActivity : ComponentActivity() {
                                     onClick = {
                                         navController.navigate(item.route)
                                         when (item.route) {
-                                            Screen.Latest.route -> viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST)
-                                            Screen.Popular.route -> viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.POPULAR)
-                                            Screen.Search.route -> viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.SEARCH, searchText)
+                                            ScreenRoute.Latest.route -> viewModel.fetchSakugaPosts(
+                                                SakugaTomoViewModel.FetchType.LATEST
+                                            )
+                                            ScreenRoute.Popular.route -> viewModel.fetchSakugaPosts(
+                                                SakugaTomoViewModel.FetchType.POPULAR
+                                            )
+                                            ScreenRoute.Search.route -> viewModel.fetchSakugaPosts(
+                                                SakugaTomoViewModel.FetchType.SEARCH, searchText)
                                         }
                                         currentRoute = item.route
                                         selectedItemIndex = index
@@ -112,7 +119,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     },
                                     badge = {
-                                        if (item.title == Screen.Liked.route) Text(text = savedItems.size.toString())
+                                        if (item.title == ScreenRoute.Liked.route) Text(text = savedItems.size.toString())
                                     },
                                     modifier = Modifier
                                         .padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -140,12 +147,12 @@ class MainActivity : ComponentActivity() {
                                         }) {
                                             Icon(
                                                 imageVector = Icons.Default.Menu,
-                                                contentDescription = "Menu"
+                                                contentDescription = stringResource(R.string.menu)
                                             )
                                         }
                                     },
                                     actions = {
-                                        if (currentRoute == Screen.Latest.route) {
+                                        if (currentRoute == ScreenRoute.Latest.route) {
                                             IconButton(
                                                 onClick = {
                                                     viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST)
@@ -153,13 +160,13 @@ class MainActivity : ComponentActivity() {
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Refresh,
-                                                    contentDescription = "Refresh"
+                                                    contentDescription = stringResource(R.string.refresh)
                                                 )
                                             }
                                         }
                                     }
                                 )
-                                if (currentRoute == Screen.Search.route) {
+                                if (currentRoute == ScreenRoute.Search.route) {
                                     var expanded by rememberSaveable { mutableStateOf(false) }
                                     SearchBar(
                                         modifier = Modifier
@@ -182,7 +189,7 @@ class MainActivity : ComponentActivity() {
                                                 },
                                                 expanded = expanded,
                                                 onExpandedChange = { expanded = it },
-                                                placeholder = { Text("Search via tags") },
+                                                placeholder = { Text(stringResource(R.string.search_via_tags)) },
                                                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                                                 trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null, modifier = Modifier.clickable { viewModel.onSearchTextChange("") }) }
                                             )

@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Sakuga Tomo</string>
     <string name="no_sakuga_posts_found">No Sakuga posts found.</string>
+    <string name="search_via_tags">Search via tags</string>
+    <string name="menu">Menu</string>
+    <string name="refresh">Refresh</string>
+    <string name="favourite_icon">Favourite Icon</string>
 </resources>

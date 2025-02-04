@@ -1,4 +1,3 @@
-
 import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.db.SakugaPostRepository
 import com.seanof.sakugatomo.data.model.SakugaPost

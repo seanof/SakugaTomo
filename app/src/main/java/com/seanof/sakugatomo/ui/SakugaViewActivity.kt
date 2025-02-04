@@ -1,5 +1,6 @@
 package com.seanof.sakugatomo.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.ComponentActivity
@@ -33,6 +34,7 @@ class SakugaViewActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("InflateParams")
     @Composable
     fun VideoPlayer(uri: String) {
         val context = LocalContext.current

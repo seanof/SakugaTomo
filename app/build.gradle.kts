@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.seanof.sakugatomo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.seanof.sakugatomo"

@@ -9,6 +9,7 @@ import com.seanof.sakugatomo.data.remote.SakugaApiResult
 import com.seanof.sakugatomo.data.remote.SakugaApiService
 import com.seanof.sakugatomo.util.Const.DEFAULT_ERROR_MSG
 import com.seanof.sakugatomo.util.Const.EMPTY
+import com.seanof.sakugatomo.util.Const.LATEST_FETCH_LIMIT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +58,7 @@ class SakugaTomoViewModel @Inject constructor(
     fun fetchSakugaPosts(fetchType: FetchType, tags: String = EMPTY) {
         viewModelScope.launch {
             when (fetchType) {
-                FetchType.LATEST ->  sakugaApiService.getSakugaPosts(50)
+                FetchType.LATEST ->  sakugaApiService.getSakugaPosts(LATEST_FETCH_LIMIT)
                 FetchType.POPULAR -> sakugaApiService.getPopularSakugaPosts()
                 FetchType.SEARCH -> sakugaApiService.searchSakugaPosts(tags)
             }
@@ -97,9 +98,6 @@ class SakugaTomoViewModel @Inject constructor(
     private val _sakugaTagsList = getAllSakugaTags
     val sakugaTagsList = searchText
         .combine(_sakugaTagsList) { text, sakugaTags ->
-            if (text.isBlank()) {
-                sakugaTags
-            }
             sakugaTags.filter { sakugaTag ->
                 sakugaTag.name.uppercase().contains(text.trim().uppercase())
             }

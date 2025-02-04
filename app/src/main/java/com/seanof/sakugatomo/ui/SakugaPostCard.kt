@@ -20,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
 import com.seanof.sakugatomo.util.Const
@@ -74,7 +76,7 @@ fun SakugaPostCard(post: SakugaPost,
             Icon(
                 imageVector = if (postSaved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
                 tint = Color.Magenta,
-                contentDescription = "Favourite Icon"
+                contentDescription = stringResource(R.string.favourite_icon)
             )
         }
     }
