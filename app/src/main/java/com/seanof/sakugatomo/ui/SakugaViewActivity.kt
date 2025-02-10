@@ -1,9 +1,11 @@
 package com.seanof.sakugatomo.ui
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +26,10 @@ import com.seanof.sakugatomo.util.Const
 class SakugaViewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
         setContent {
             SakugaTomoTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -42,6 +47,7 @@ class SakugaViewActivity : ComponentActivity() {
             ExoPlayer.Builder(context).build().apply {
                 setMediaItem(MediaItem.fromUri(uri))
                 prepare()
+                repeatMode = ExoPlayer.REPEAT_MODE_ALL
                 playWhenReady = true
             }
         }

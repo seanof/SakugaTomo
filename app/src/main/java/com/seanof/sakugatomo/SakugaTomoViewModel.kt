@@ -44,7 +44,7 @@ class SakugaTomoViewModel @Inject constructor(
         fetchSakugaPosts(FetchType.LATEST)
     }
 
-    private fun fetchSakugaTags() {
+    fun fetchSakugaTags() {
         viewModelScope.launch {
             sakugaApiService.getSakugaTags()
                 .flowOn(defaultDispatcher)

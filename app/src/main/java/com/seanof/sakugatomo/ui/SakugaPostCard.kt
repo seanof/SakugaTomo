@@ -17,11 +17,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -67,7 +69,9 @@ fun SakugaPostCard(post: SakugaPost,
                 }
         )
         IconButton(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .blur(radius = 0.1.dp),
             onClick = {
                 if (post.saved) onItemDelete(post) else onItemClick(post)
                 postSaved = !postSaved
@@ -75,7 +79,7 @@ fun SakugaPostCard(post: SakugaPost,
             }) {
             Icon(
                 imageVector = if (postSaved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                tint = Color.Magenta,
+                tint = colorResource(id = R.color.heartIconTint),
                 contentDescription = stringResource(R.string.favourite_icon)
             )
         }

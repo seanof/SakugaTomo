@@ -20,6 +20,7 @@ mockitoAndroid = "5.14.2"
 kotlinxCoroutinesTest = "1.9.0"
 coreTesting = "1.1.1"
 navigationCompose = "2.8.6"
+coreSplashscreen = "1.2.0-alpha02"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +56,7 @@ mockito-android = { group = "org.mockito", name = "mockito-android", version.ref
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 core-testing = { group = "android.arch.core", name = "core-testing", version.ref = "coreTesting" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -16,7 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.seanof.sakugatomo.R
@@ -43,13 +43,13 @@ fun SakugaItemsGrid(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 4.dp, end = 4.dp),
+                .padding(start = 2.dp, end = 2.dp),
             contentAlignment = Alignment.Center
         ) {
             when (apiResult) {
                 is SakugaApiResult.Loading -> CircularProgressIndicator(
                     modifier = Modifier.size(50.dp),
-                    color = Color.Blue
+                    color = colorResource(id = R.color.colorTint)
                 )
                 is SakugaApiResult.Error -> Text(DEFAULT_ERROR_MSG)
                 is SakugaApiResult.Success -> {
@@ -74,7 +74,7 @@ fun SakugaItemsGrid(
                             },
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(bottom = 60.dp),
+                                .padding(bottom = padding.calculateBottomPadding()),
                         )
                     } else {
                         Text(stringResource(R.string.no_sakuga_posts_found))

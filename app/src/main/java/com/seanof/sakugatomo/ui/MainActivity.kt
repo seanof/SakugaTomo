@@ -1,7 +1,9 @@
 package com.seanof.sakugatomo.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -46,10 +48,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
@@ -64,8 +68,12 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
         setContent {
             SakugaTomoTheme {
                 val navController = rememberNavController()
@@ -147,6 +155,7 @@ class MainActivity : ComponentActivity() {
                                         }) {
                                             Icon(
                                                 imageVector = Icons.Default.Menu,
+                                                tint = colorResource(id = R.color.colorTint),
                                                 contentDescription = stringResource(R.string.menu)
                                             )
                                         }
@@ -160,6 +169,7 @@ class MainActivity : ComponentActivity() {
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Refresh,
+                                                    tint = colorResource(id = R.color.colorTint),
                                                     contentDescription = stringResource(R.string.refresh)
                                                 )
                                             }

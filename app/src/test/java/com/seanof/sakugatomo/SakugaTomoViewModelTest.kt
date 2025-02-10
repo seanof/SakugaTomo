@@ -1,23 +1,27 @@
 import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.db.SakugaPostRepository
 import com.seanof.sakugatomo.data.model.SakugaPost
+import com.seanof.sakugatomo.data.model.SakugaTag
 import com.seanof.sakugatomo.data.remote.SakugaApiResult
 import com.seanof.sakugatomo.data.remote.SakugaApiService
 import com.seanof.sakugatomo.util.Const.DEFAULT_ERROR_MSG
+import com.seanof.sakugatomo.util.Const.LATEST_FETCH_LIMIT
+import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
 
 @ExperimentalCoroutinesApi
 class SakugaTomoViewModelTest {
@@ -46,10 +50,42 @@ class SakugaTomoViewModelTest {
         // Arrange: Mock the service to return a successful result
         val mockPosts = listOf(SakugaPost(id = 1, source = "Test Post"))
         val mockResult = SakugaApiResult.Success(mockPosts)
-        Mockito.`when`(sakugaApiService.getSakugaPosts(50)).thenReturn(flowOf(mockResult))
+        Mockito.`when`(sakugaApiService.getSakugaPosts(LATEST_FETCH_LIMIT)).thenReturn(flowOf(mockResult))
 
         // Act: Call fetchSakugaPosts with FetchType.LATEST
-        viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST)
+        viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST, "testTag")
+
+        // Assert: Collect the state and verify it contains the expected posts
+        val emittedState = viewModel.sakugaPosts.first()
+        assert(emittedState is SakugaApiResult.Success)
+        assert((emittedState as SakugaApiResult.Success).data == mockPosts)
+    }
+
+    @Test
+    fun `test fetchSakugaPosts with SEARCH fetch type`() = runTest {
+        // Arrange: Mock the service to return a successful result
+        val mockPosts = listOf(SakugaPost(id = 1, source = "Test Post"))
+        val mockResult = SakugaApiResult.Success(mockPosts)
+        Mockito.`when`(sakugaApiService.searchSakugaPosts("testTag")).thenReturn(flowOf(mockResult))
+
+        // Act: Call fetchSakugaPosts with FetchType.SEARCH
+        viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.SEARCH, "testTag")
+
+        // Assert: Collect the state and verify it contains the expected posts
+        val emittedState = viewModel.sakugaPosts.first()
+        assert(emittedState is SakugaApiResult.Success)
+        assert((emittedState as SakugaApiResult.Success).data == mockPosts)
+    }
+
+    @Test
+    fun `test fetchSakugaPosts with POPULAR fetch type`() = runTest {
+        // Arrange: Mock the service to return a successful result
+        val mockPosts = listOf(SakugaPost(id = 1, source = "Test Post"))
+        val mockResult = SakugaApiResult.Success(mockPosts)
+        Mockito.`when`(sakugaApiService.getPopularSakugaPosts()).thenReturn(flowOf(mockResult))
+
+        // Act: Call fetchSakugaPosts with FetchType.POPULAR
+        viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.POPULAR)
 
         // Assert: Collect the state and verify it contains the expected posts
         val emittedState = viewModel.sakugaPosts.first()
@@ -61,7 +97,7 @@ class SakugaTomoViewModelTest {
     fun `test fetchSakugaPosts handles error`() = runTest {
         // Arrange: Mock the service to return an error
         val errorMessage = DEFAULT_ERROR_MSG
-        Mockito.`when`(sakugaApiService.getSakugaPosts(50))
+        Mockito.`when`(sakugaApiService.getSakugaPosts(LATEST_FETCH_LIMIT))
             .thenReturn(flowOf(SakugaApiResult.Error(errorMessage)))
 
         // Act: Call fetchSakugaPosts with FetchType.LATEST
@@ -82,7 +118,7 @@ class SakugaTomoViewModelTest {
         viewModel.saveSakugaPost(sakugaPost)
 
         // Assert: Verify that the repository's insert function was called
-        Mockito.verify(sakugaPostRepository).insert(sakugaPost)
+        verify(sakugaPostRepository).insert(sakugaPost)
     }
 
     @Test
@@ -94,7 +130,7 @@ class SakugaTomoViewModelTest {
         viewModel.removeSakugaPost(sakugaPost)
 
         // Assert: Verify that the repository's delete function was called
-        Mockito.verify(sakugaPostRepository).delete(sakugaPost)
+        verify(sakugaPostRepository).delete(sakugaPost)
     }
 
     @Test
@@ -108,6 +144,24 @@ class SakugaTomoViewModelTest {
 
         // Assert: Verify that the saved field is updated for posts
         assert(savedPosts[0].saved)
+    }
+
+    @Test
+    fun `test onSearchTextChange updates searchText state`() = runTest {
+        val searchQuery = "new search query"
+        viewModel.onSearchTextChange(searchQuery)
+        val latestSearchText = viewModel.searchText.first()
+
+        assertEquals(searchQuery, latestSearchText)
+    }
+
+    @Test
+    fun `test fetchSakugaTags calls repository to insert tags`() = runTest {
+        val mockTags = listOf(SakugaTag(id = 1, name = "tag1"), SakugaTag(id = 2, name = "tag2"))
+        Mockito.`when`(sakugaApiService.getSakugaTags()).thenReturn(flowOf(SakugaApiResult.Success(mockTags)))
+        viewModel.fetchSakugaTags()
+
+        verify(sakugaPostRepository).insertTags(mockTags)
     }
 
     @After
