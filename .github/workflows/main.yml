@@ -23,6 +23,6 @@ jobs:
     - name: Releasing using Hub
       uses: CarlosCGA/action-release-debugapk@master
       env:
-       TOKEN: ${{ secrets.TOKEN }}
+       GITHUB_TOKEN: ${{ secrets.TOKEN }}
        APP_FOLDER: app
        RELEASE_TITLE: New App Build
