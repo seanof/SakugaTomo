@@ -32,6 +32,4 @@ fun NavigationStack(navHostController: NavHostController,
             SakugaItemsGrid(padding, apiResult, savedPosts, ScreenRoute.Search.route, likedPosts, onItemClick, onItemDelete)
         }
     }
-
-
 }

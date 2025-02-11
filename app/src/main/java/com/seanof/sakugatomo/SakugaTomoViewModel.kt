@@ -32,11 +32,6 @@ class SakugaTomoViewModel @Inject constructor(
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
     val sakugaPosts = _posts.asStateFlow()
-    private val getAllSakugaTags: StateFlow<List<SakugaTag>> =
-        sakugaPostRepository.sakugaTags
-            .catch { exception -> exception.printStackTrace() }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
     val savedSakugaPosts = sakugaPostRepository.sakugaPosts
 
     init {
@@ -94,6 +89,12 @@ class SakugaTomoViewModel @Inject constructor(
     fun removeSakugaPost(sakugaPost: SakugaPost) {
         viewModelScope.launch { sakugaPostRepository.delete(sakugaPost) }
     }
+
+    // Converts Flow into StateFlow for use in listing tags for SearchBar
+    private val getAllSakugaTags: StateFlow<List<SakugaTag>> =
+        sakugaPostRepository.sakugaTags
+            .catch { exception -> exception.printStackTrace() }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val _sakugaTagsList = getAllSakugaTags
     val sakugaTagsList = searchText

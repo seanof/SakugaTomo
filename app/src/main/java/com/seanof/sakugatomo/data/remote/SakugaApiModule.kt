@@ -20,13 +20,14 @@ import javax.inject.Singleton
 @dagger.Module
 @InstallIn(SingletonComponent::class)
 object SakugaApiModule {
+    private const val BASE_URL = "https://sakugabooru.com"
 
     @Singleton
     @Provides
     fun provideHttpClient(): HttpClient {
         return HttpClient(Android) {
             install(DefaultRequest) {
-                url("https://sakugabooru.com")
+                url(BASE_URL)
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
             }
             install(ContentNegotiation) {
