@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ci-image:v1.0.0
-      options: --user 1001
     steps:
     - uses: actions/checkout@v1
     - name: set up JDK 21
@@ -23,11 +20,9 @@ jobs:
       run: ./gradlew build
     - name: Build Debug APK
       run: ./gradlew assembleDebug
-    - name: Generate version.txt for Hub release
-      run: ./gradlew generateVersionTxt
     - name: Releasing using Hub
-      uses: thenoveltyseeker/action-release-debugapk@master
+      uses: CarlosCGA/action-release-debugapk@master
       env:
-       GITHUB_TOKEN: ${{ secrets.TOKEN }}
+       TOKEN: ${{ secrets.TOKEN }}
        APP_FOLDER: app
        RELEASE_TITLE: New Build
