@@ -25,4 +25,4 @@ jobs:
       env:
        TOKEN: ${{ secrets.TOKEN }}
        APP_FOLDER: app
-       RELEASE_TITLE: New Build
+       RELEASE_TITLE: New App Build
