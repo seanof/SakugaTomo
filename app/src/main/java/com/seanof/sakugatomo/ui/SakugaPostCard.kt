@@ -24,11 +24,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.data.model.SakugaPost
+import com.seanof.sakugatomo.ui.shimmer.ShimmerAnimation
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
 import com.seanof.sakugatomo.util.Const
 import kotlinx.coroutines.Dispatchers
@@ -43,9 +44,6 @@ fun SakugaPostCard(post: SakugaPost,
         .dispatcher(Dispatchers.IO)
         .memoryCacheKey(post.preview_url)
         .diskCacheKey(post.preview_url)
-//        .placeholder(placeholder)
-//        .error(placeholder)
-//        .fallback(placeholder)
         .diskCachePolicy(CachePolicy.ENABLED)
         .memoryCachePolicy(CachePolicy.ENABLED)
         .build()
@@ -55,10 +53,15 @@ fun SakugaPostCard(post: SakugaPost,
     }
 
     Box {
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = imageRequest,
             contentDescription = null,
             contentScale = ContentScale.Crop,
+            loading = {
+                repeat(5) {
+                    ShimmerAnimation()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()

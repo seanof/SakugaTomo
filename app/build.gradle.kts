@@ -52,6 +52,12 @@ android {
     }
 }
 
+task("generateVersionTxt") {
+    doLast {
+        file("./version.txt").writeText(android.defaultConfig.versionName.toString())
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)

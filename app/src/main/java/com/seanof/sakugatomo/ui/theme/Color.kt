@@ -73,3 +73,11 @@ val surfaceContainerLowDark = Color(0xFF1D1B20)
 val surfaceContainerDark = Color(0xFF211F24)
 val surfaceContainerHighDark = Color(0xFF2B292F)
 val surfaceContainerHighestDark = Color(0xFF36343A)
+
+val themeColor = Color(0xFF3D3A42)
+
+val ShimmerColors = listOf(
+    themeColor.copy(0.9f),
+    themeColor.copy(0.2f),
+    themeColor.copy(0.9f)
+)
