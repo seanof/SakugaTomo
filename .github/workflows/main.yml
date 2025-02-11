@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ci-image:v1.0.0
+      options: --user 1001
     steps:
     - uses: actions/checkout@v1
     - name: set up JDK 21
