@@ -44,5 +44,5 @@ object SakugaApiModule {
     fun provideApiService(httpClient: HttpClient): SakugaApiService = SakugaApiServiceImpl(httpClient)
 
     @Provides
-    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
+    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
