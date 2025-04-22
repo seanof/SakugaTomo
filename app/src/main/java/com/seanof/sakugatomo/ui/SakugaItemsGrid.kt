@@ -20,15 +20,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.seanof.sakugatomo.R
+import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.model.SakugaPost
-import com.seanof.sakugatomo.data.remote.SakugaApiResult
 import com.seanof.sakugatomo.ui.navigation.ScreenRoute
-import com.seanof.sakugatomo.util.Const.DEFAULT_ERROR_MSG
 
 @Composable
 fun SakugaItemsGrid(
     padding: PaddingValues,
-    apiResult: SakugaApiResult<List<SakugaPost>>,
+    uiState: SakugaTomoViewModel.ScreenUiState,
     likedPosts: List<SakugaPost>,
     currentRoute: String,
     getLikedSakugaPost: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
@@ -46,17 +45,16 @@ fun SakugaItemsGrid(
                 .padding(start = 2.dp, end = 2.dp),
             contentAlignment = Alignment.Center
         ) {
-            when (apiResult) {
-                is SakugaApiResult.Loading -> CircularProgressIndicator(
+            when (uiState) {
+                is SakugaTomoViewModel.ScreenUiState.Loading -> CircularProgressIndicator(
                     modifier = Modifier.size(50.dp),
                     color = colorResource(id = R.color.colorTint)
                 )
-                is SakugaApiResult.Error -> Text(DEFAULT_ERROR_MSG)
-                is SakugaApiResult.Success -> {
-                    getLikedSakugaPost.invoke(apiResult.data, likedPosts)
+                is SakugaTomoViewModel.ScreenUiState.Error -> Text(uiState.errorMessage)
+                is SakugaTomoViewModel.ScreenUiState.Success -> {
+                    getLikedSakugaPost.invoke(uiState.posts, likedPosts)
                     val postList =
-                        if (currentRoute == ScreenRoute.Liked.route) likedPosts else apiResult.data
-                            ?: emptyList()
+                        if (currentRoute == ScreenRoute.Liked.route) likedPosts else uiState.posts
 
                     if (postList.isNotEmpty()) {
                         LazyVerticalStaggeredGrid(

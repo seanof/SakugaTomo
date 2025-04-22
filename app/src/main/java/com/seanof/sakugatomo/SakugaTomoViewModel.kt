@@ -28,14 +28,21 @@ class SakugaTomoViewModel @Inject constructor(
     private val sakugaApiService: SakugaApiService,
     private val sakugaPostRepository: SakugaPostRepository,
     private val defaultDispatcher: CoroutineDispatcher) : ViewModel() {
-    private val _posts = MutableStateFlow<SakugaApiResult<List<SakugaPost>>>(SakugaApiResult.Loading())
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
-    val sakugaPosts = _posts.asStateFlow()
     val savedSakugaPosts = sakugaPostRepository.sakugaPosts
 
+    private val _uiState = MutableStateFlow<ScreenUiState>(ScreenUiState.Loading)
+    val uiState: StateFlow<ScreenUiState> = _uiState.asStateFlow()
+
+    sealed class ScreenUiState {
+        data object Loading : ScreenUiState()
+        data class Error(val errorMessage: String) : ScreenUiState()
+        data class Success(val posts: List<SakugaPost>) : ScreenUiState()
+    }
+
     init {
-        fetchSakugaTags()
+//        fetchSakugaTags()
         fetchSakugaPosts(FetchType.LATEST)
     }
 
@@ -59,10 +66,19 @@ class SakugaTomoViewModel @Inject constructor(
             }
                 .flowOn(defaultDispatcher)
                 .catch {
-                    _posts.value = SakugaApiResult.Error(it.message ?: DEFAULT_ERROR_MSG)
+                    _uiState.value = ScreenUiState.Error(it.message ?: DEFAULT_ERROR_MSG)
                 }
-                .collect {
-                    _posts.value = it
+                .collect { result ->
+                    when (result) {
+                        is SakugaApiResult.Success ->
+                            _uiState.value = ScreenUiState.Success(result.data ?: emptyList())
+
+                        is SakugaApiResult.Error ->
+                            _uiState.value = ScreenUiState.Error(result.error ?: DEFAULT_ERROR_MSG)
+
+                        is SakugaApiResult.Loading ->
+                            _uiState.value = ScreenUiState.Loading
+                    }
                 }
         }
     }

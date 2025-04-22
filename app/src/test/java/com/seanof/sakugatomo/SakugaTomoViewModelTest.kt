@@ -56,9 +56,9 @@ class SakugaTomoViewModelTest {
         viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST, "testTag")
 
         // Assert: Collect the state and verify it contains the expected posts
-        val emittedState = viewModel.sakugaPosts.first()
-        assert(emittedState is SakugaApiResult.Success)
-        assert((emittedState as SakugaApiResult.Success).data == mockPosts)
+        val emittedState = viewModel.uiState.first()
+        assert(emittedState is SakugaTomoViewModel.ScreenUiState.Success)
+        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Success).posts == listOf(SakugaPost(id = 1, source = "Test Post")))
     }
 
     @Test
@@ -72,9 +72,9 @@ class SakugaTomoViewModelTest {
         viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.SEARCH, "testTag")
 
         // Assert: Collect the state and verify it contains the expected posts
-        val emittedState = viewModel.sakugaPosts.first()
-        assert(emittedState is SakugaApiResult.Success)
-        assert((emittedState as SakugaApiResult.Success).data == mockPosts)
+        val emittedState = viewModel.uiState.first()
+        assert(emittedState is SakugaTomoViewModel.ScreenUiState.Success)
+        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Success).posts == listOf(SakugaPost(id = 1, source = "Test Post")))
     }
 
     @Test
@@ -88,9 +88,9 @@ class SakugaTomoViewModelTest {
         viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.POPULAR)
 
         // Assert: Collect the state and verify it contains the expected posts
-        val emittedState = viewModel.sakugaPosts.first()
-        assert(emittedState is SakugaApiResult.Success)
-        assert((emittedState as SakugaApiResult.Success).data == mockPosts)
+        val emittedState = viewModel.uiState.first()
+        assert(emittedState is SakugaTomoViewModel.ScreenUiState.Success)
+        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Success).posts == listOf(SakugaPost(id = 1, source = "Test Post")))
     }
 
     @Test
@@ -104,9 +104,9 @@ class SakugaTomoViewModelTest {
         viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST)
 
         // Assert: Collect the state and verify it contains the error message
-        val emittedState = viewModel.sakugaPosts.first()
-        assert(emittedState is SakugaApiResult.Error)
-        assert((emittedState as SakugaApiResult.Error).error == errorMessage)
+        val emittedState = viewModel.uiState.first()
+        assert(emittedState is SakugaTomoViewModel.ScreenUiState.Error)
+        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Error).errorMessage == errorMessage)
     }
 
     @Test
@@ -118,7 +118,7 @@ class SakugaTomoViewModelTest {
         viewModel.saveSakugaPost(sakugaPost)
 
         // Assert: Verify that the repository's insert function was called
-        verify(sakugaPostRepository).insert(sakugaPost)
+        verify(sakugaPostRepository).insert(SakugaPost(id = 1, source = "Test Post"))
     }
 
     @Test
@@ -130,7 +130,7 @@ class SakugaTomoViewModelTest {
         viewModel.removeSakugaPost(sakugaPost)
 
         // Assert: Verify that the repository's delete function was called
-        verify(sakugaPostRepository).delete(sakugaPost)
+        verify(sakugaPostRepository).delete(SakugaPost(id = 1, source = "Test Post"))
     }
 
     @Test
@@ -161,7 +161,7 @@ class SakugaTomoViewModelTest {
         Mockito.`when`(sakugaApiService.getSakugaTags()).thenReturn(flowOf(SakugaApiResult.Success(mockTags)))
         viewModel.fetchSakugaTags()
 
-        verify(sakugaPostRepository).insertTags(mockTags)
+        verify(sakugaPostRepository).insertTags(listOf(SakugaTag(id = 1, name = "tag1"), SakugaTag(id = 2, name = "tag2")))
     }
 
     @After

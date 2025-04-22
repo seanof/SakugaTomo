@@ -38,7 +38,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +53,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
@@ -78,10 +78,10 @@ class MainActivity : ComponentActivity() {
             SakugaTomoTheme {
                 val navController = rememberNavController()
                 val viewModel: SakugaTomoViewModel by viewModels()
-                val savedItems = viewModel.savedSakugaPosts.collectAsState(initial = listOf()).value
-                val apiResult by viewModel.sakugaPosts.collectAsState()
-                val searchText by viewModel.searchText.collectAsState()
-                val sakugaTagsList by viewModel.sakugaTagsList.collectAsState()
+                val savedItems = viewModel.savedSakugaPosts.collectAsStateWithLifecycle(initialValue = listOf()).value
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val searchText by viewModel.searchText.collectAsStateWithLifecycle()
+                val sakugaTagsList by viewModel.sakugaTagsList.collectAsStateWithLifecycle()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 var currentRoute by remember {
@@ -238,7 +238,7 @@ class MainActivity : ComponentActivity() {
                         NavigationStack(
                             navController,
                             padding = padding,
-                            apiResult = apiResult,
+                            uiState = uiState,
                             savedPosts = savedItems,
                             viewModel::setLikedPostsFromSavedPosts,
                             viewModel::saveSakugaPost,
