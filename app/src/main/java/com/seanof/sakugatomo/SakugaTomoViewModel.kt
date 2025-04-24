@@ -1,5 +1,6 @@
 package com.seanof.sakugatomo
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seanof.sakugatomo.data.db.SakugaPostRepository
@@ -42,7 +43,7 @@ class SakugaTomoViewModel @Inject constructor(
     }
 
     init {
-//        fetchSakugaTags()
+        fetchSakugaTags()
         fetchSakugaPosts(FetchType.LATEST)
     }
 

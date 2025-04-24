@@ -1,6 +1,5 @@
 package com.seanof.sakugatomo.ui
 
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,12 +30,12 @@ import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.ui.shimmer.ShimmerAnimation
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
-import com.seanof.sakugatomo.util.Const
 import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun SakugaPostCard(post: SakugaPost,
-                   onItemClick: (SakugaPost) -> Unit = {},
+                   onItemClick: (uri: String) -> Unit = {},
+                   onItemLiked: (SakugaPost) -> Unit = {},
                    onItemDelete: (SakugaPost) -> Unit = {}) {
     val context = LocalContext.current
     val imageRequest = ImageRequest.Builder(context)
@@ -66,9 +65,7 @@ fun SakugaPostCard(post: SakugaPost,
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .clickable {
-                    val intent = Intent(context, SakugaViewActivity::class.java)
-                    intent.putExtra(Const.URI, post.file_url)
-                    context.startActivity(intent)
+                    onItemClick(post.file_url)
                 }
         )
         IconButton(
@@ -76,7 +73,7 @@ fun SakugaPostCard(post: SakugaPost,
                 .align(Alignment.BottomEnd)
                 .blur(radius = 0.1.dp),
             onClick = {
-                if (post.saved) onItemDelete(post) else onItemClick(post)
+                if (post.saved) onItemDelete(post) else onItemLiked(post)
                 postSaved = !postSaved
                 post.saved = !post.saved
             }) {

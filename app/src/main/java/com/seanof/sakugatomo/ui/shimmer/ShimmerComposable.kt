@@ -19,7 +19,7 @@ fun ShimmerItem(
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .size(170.dp)
+                .size(150.dp)
                 .background(brush = brush)
         )
     }

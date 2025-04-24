@@ -31,7 +31,8 @@ fun SakugaItemsGrid(
     likedPosts: List<SakugaPost>,
     currentRoute: String,
     getLikedSakugaPost: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
-    onItemClick: (SakugaPost) -> Unit = {},
+    onItemClick: (uri: String) -> Unit = {},
+    onItemLiked: (SakugaPost) -> Unit = {},
     onItemDelete: (SakugaPost) -> Unit = {}) {
     Surface(
         modifier = Modifier
@@ -66,6 +67,7 @@ fun SakugaItemsGrid(
                                     SakugaPostCard(
                                         post,
                                         onItemClick,
+                                        onItemLiked,
                                         onItemDelete
                                     )
                                 }

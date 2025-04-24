@@ -41,7 +41,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -54,6 +53,7 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
@@ -84,11 +84,15 @@ class MainActivity : ComponentActivity() {
                 val sakugaTagsList by viewModel.sakugaTagsList.collectAsStateWithLifecycle()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
-                var currentRoute by remember {
-                    mutableStateOf(ScreenRoute.Latest.route)
-                }
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                var showTopBar by rememberSaveable { mutableStateOf(true) }
+                val currentRoute = navBackStackEntry?.destination?.route
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
+                }
+                showTopBar = when (navBackStackEntry?.destination?.route) {
+                    ScreenRoute.Latest.route, ScreenRoute.Search.route, ScreenRoute.Liked.route, ScreenRoute.Popular.route -> true
+                    else -> false
                 }
 
                 ModalNavigationDrawer(
@@ -112,7 +116,6 @@ class MainActivity : ComponentActivity() {
                                             ScreenRoute.Search.route -> viewModel.fetchSakugaPosts(
                                                 SakugaTomoViewModel.FetchType.SEARCH, searchText)
                                         }
-                                        currentRoute = item.route
                                         selectedItemIndex = index
                                         scope.launch {
                                             drawerState.close()
@@ -127,7 +130,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     },
                                     badge = {
-                                        if (item.title == ScreenRoute.Liked.route) Text(text = savedItems.size.toString())
+                                        if (item.route == ScreenRoute.Liked.route) Text(text = savedItems.size.toString())
                                     },
                                     modifier = Modifier
                                         .padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -140,94 +143,111 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         topBar = {
-                            Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
-                                TopAppBar(
-                                    title = {
-                                        Text(text = stringResource(R.string.app_name))
-                                    },
-                                    navigationIcon = {
-                                        IconButton(onClick = {
-                                            scope.launch {
-                                                drawerState.apply {
-                                                    if (isClosed) open() else close()
-                                                }
-                                            }
-                                        }) {
-                                            Icon(
-                                                imageVector = Icons.Default.Menu,
-                                                tint = colorResource(id = R.color.colorTint),
-                                                contentDescription = stringResource(R.string.menu)
-                                            )
-                                        }
-                                    },
-                                    actions = {
-                                        if (currentRoute == ScreenRoute.Latest.route) {
-                                            IconButton(
-                                                onClick = {
-                                                    viewModel.fetchSakugaPosts(SakugaTomoViewModel.FetchType.LATEST)
-                                                }
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Refresh,
-                                                    tint = colorResource(id = R.color.colorTint),
-                                                    contentDescription = stringResource(R.string.refresh)
-                                                )
-                                            }
-                                        }
-                                    }
-                                )
-                                if (currentRoute == ScreenRoute.Search.route) {
-                                    var expanded by rememberSaveable { mutableStateOf(false) }
-                                    SearchBar(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .background(MaterialTheme.colorScheme.background)
-                                            .padding(bottom = 20.dp)
-                                            .semantics { traversalIndex = 0f },
-                                        inputField = {
-                                            SearchBarDefaults.InputField(
-                                                query = searchText,
-                                                onQueryChange = {
-                                                    viewModel.onSearchTextChange(it)
-                                                    viewModel.fetchSakugaPosts(
-                                                        SakugaTomoViewModel.FetchType.SEARCH,
-                                                        it
-                                                    )},
-                                                onSearch = {
-                                                    viewModel.onSearchTextChange(it)
-                                                    expanded = false
-                                                },
-                                                expanded = expanded,
-                                                onExpandedChange = { expanded = it },
-                                                placeholder = { Text(stringResource(R.string.search_via_tags)) },
-                                                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                                                trailingIcon = { Icon(Icons.Default.Clear, contentDescription = null, modifier = Modifier.clickable { viewModel.onSearchTextChange("") }) }
-                                            )
+                            if (showTopBar) {
+                                Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
+                                    TopAppBar(
+                                        title = {
+                                            Text(text = stringResource(R.string.app_name))
                                         },
-                                        expanded = expanded,
-                                        onExpandedChange = { expanded = it },
-                                    ) {
-                                        LazyColumn(
-                                            contentPadding = PaddingValues(12.dp),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                                            modifier = Modifier
-                                                .semantics { traversalIndex = 1f },
-                                        ) {
-                                            items(sakugaTagsList) {
-                                                Text(
-                                                    text = it.name,
-                                                    modifier = Modifier
-                                                        .clickable {
-                                                            viewModel.onSearchTextChange(it.name)
-                                                            expanded = false
-                                                            viewModel.fetchSakugaPosts(
-                                                                SakugaTomoViewModel.FetchType.SEARCH,
-                                                                it.name
-                                                            )
-                                                        }
-                                                        .fillMaxWidth()
-                                                        .padding(horizontal = 16.dp),
+                                        navigationIcon = {
+                                            IconButton(onClick = {
+                                                scope.launch {
+                                                    drawerState.apply {
+                                                        if (isClosed) open() else close()
+                                                    }
+                                                }
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Menu,
+                                                    tint = colorResource(id = R.color.colorTint),
+                                                    contentDescription = stringResource(R.string.menu)
                                                 )
+                                            }
+                                        },
+                                        actions = {
+                                            if (currentRoute == ScreenRoute.Latest.route) {
+                                                IconButton(
+                                                    onClick = {
+                                                        viewModel.fetchSakugaPosts(
+                                                            SakugaTomoViewModel.FetchType.LATEST
+                                                        )
+                                                    }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Refresh,
+                                                        tint = colorResource(id = R.color.colorTint),
+                                                        contentDescription = stringResource(R.string.refresh)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    )
+                                    if (currentRoute == ScreenRoute.Search.route) {
+                                        var expanded by rememberSaveable { mutableStateOf(false) }
+                                        SearchBar(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .background(MaterialTheme.colorScheme.background)
+                                                .padding(bottom = 20.dp)
+                                                .semantics { traversalIndex = 0f },
+                                            inputField = {
+                                                SearchBarDefaults.InputField(
+                                                    query = searchText,
+                                                    onQueryChange = {
+                                                        viewModel.onSearchTextChange(it)
+                                                        viewModel.fetchSakugaPosts(
+                                                            SakugaTomoViewModel.FetchType.SEARCH,
+                                                            it
+                                                        )
+                                                    },
+                                                    onSearch = {
+                                                        viewModel.onSearchTextChange(it)
+                                                        expanded = false
+                                                    },
+                                                    expanded = expanded,
+                                                    onExpandedChange = { expanded = it },
+                                                    placeholder = { Text(stringResource(R.string.search_via_tags)) },
+                                                    leadingIcon = {
+                                                        Icon(
+                                                            Icons.Default.Search,
+                                                            contentDescription = null
+                                                        )
+                                                    },
+                                                    trailingIcon = {
+                                                        Icon(
+                                                            Icons.Default.Clear,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.clickable {
+                                                                viewModel.onSearchTextChange("")
+                                                            })
+                                                    }
+                                                )
+                                            },
+                                            expanded = expanded,
+                                            onExpandedChange = { expanded = it },
+                                        ) {
+                                            LazyColumn(
+                                                contentPadding = PaddingValues(12.dp),
+                                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                modifier = Modifier
+                                                    .semantics { traversalIndex = 1f },
+                                            ) {
+                                                items(sakugaTagsList) {
+                                                    Text(
+                                                        text = it.name,
+                                                        modifier = Modifier
+                                                            .clickable {
+                                                                viewModel.onSearchTextChange(it.name)
+                                                                expanded = false
+                                                                viewModel.fetchSakugaPosts(
+                                                                    SakugaTomoViewModel.FetchType.SEARCH,
+                                                                    it.name
+                                                                )
+                                                            }
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 16.dp),
+                                                    )
+                                                }
                                             }
                                         }
                                     }
