@@ -1,6 +1,5 @@
 package com.seanof.sakugatomo
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seanof.sakugatomo.data.db.SakugaPostRepository
