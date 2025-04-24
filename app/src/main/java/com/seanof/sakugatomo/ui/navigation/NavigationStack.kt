@@ -35,7 +35,7 @@ fun NavigationStack(navHostController: NavHostController,
         composable<ScreenRoute.Player> { backStackEntry ->
             val itemUri = (backStackEntry.toRoute<ScreenRoute.Player>() as? ScreenRoute.Player)?.uri
             itemUri?.let {
-                SakugaPlayer(padding, itemUri, uiState, onItemLiked, onItemDelete)
+                SakugaPlayer(padding, itemUri, uiState, savedPosts, onItemLiked, onItemDelete)
             }
         }
     }

@@ -38,6 +38,7 @@ fun SakugaPlayer(
     padding: PaddingValues,
     uri: String,
     uiState: SakugaTomoViewModel.ScreenUiState,
+    likedPosts: List<SakugaPost>,
     onItemLiked: (SakugaPost) -> Unit = {},
     onItemDelete: (SakugaPost) -> Unit = {}
 ) {
@@ -53,6 +54,18 @@ fun SakugaPlayer(
                 val post = uiState.posts.find {
                     it.file_url == uri
                 }
+                if (likedPosts.contains(post)) {
+                    post?.saved = true
+                    postSaved = true
+                }
+                if (post == null) {
+                    val likedPost = likedPosts.find { it.file_url == uri }
+                    if (likedPost != null) {
+                        post?.saved = true
+                        postSaved = true
+                    }
+                }
+
                 VideoPlayer(uri)
                 Box(modifier = Modifier.fillMaxSize()) {
                     IconButton(
