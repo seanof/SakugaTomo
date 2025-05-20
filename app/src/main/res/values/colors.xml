@@ -4,5 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="launcher">#FF222222</color>
     <color name="colorTint">#FFEE8877</color>
-    <color name="heartIconTint">#EDDD1EB6</color>
+    <color name="heartIconTint">#EDDD1E1E</color>
 </resources>

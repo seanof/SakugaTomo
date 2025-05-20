@@ -32,7 +32,6 @@ fun SakugaItemsGrid(
     currentRoute: String,
     getLikedSakugaPost: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
     onItemClick: (uri: String) -> Unit = {},
-    onItemLiked: (SakugaPost) -> Unit = {},
     onItemDelete: (SakugaPost) -> Unit = {}) {
     Surface(
         modifier = Modifier
@@ -55,7 +54,7 @@ fun SakugaItemsGrid(
                 is SakugaTomoViewModel.ScreenUiState.Success -> {
                     getLikedSakugaPost.invoke(uiState.posts, likedPosts)
                     val postList =
-                        if (currentRoute == ScreenRoute.Liked.route) likedPosts else uiState.posts
+                        if (currentRoute == ScreenRoute.Favourites.route) likedPosts else uiState.posts
 
                     if (postList.isNotEmpty()) {
                         LazyVerticalStaggeredGrid(
@@ -67,7 +66,6 @@ fun SakugaItemsGrid(
                                     SakugaPostCard(
                                         post,
                                         onItemClick,
-                                        onItemLiked,
                                         onItemDelete
                                     )
                                 }

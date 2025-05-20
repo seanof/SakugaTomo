@@ -1,14 +1,14 @@
 package com.seanof.sakugatomo.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavigationItem(
@@ -26,10 +26,10 @@ data class NavigationItem(
                 unselectedIcon = Icons.Outlined.Home
             ),
             NavigationItem(
-                title = "Liked Posts",
-                route = ScreenRoute.Liked.route,
-                selectedIcon = Icons.Filled.ThumbUp,
-                unselectedIcon = Icons.Outlined.ThumbUp
+                title = "Favourite Posts",
+                route = ScreenRoute.Favourites.route,
+                selectedIcon = Icons.Filled.Favorite,
+                unselectedIcon = Icons.Outlined.Favorite
             ),
             NavigationItem(
                 title = "Popular Posts",

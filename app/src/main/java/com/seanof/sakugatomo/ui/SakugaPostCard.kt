@@ -4,9 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -17,10 +18,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
@@ -35,7 +36,6 @@ import kotlinx.coroutines.Dispatchers
 @Composable
 fun SakugaPostCard(post: SakugaPost,
                    onItemClick: (uri: String) -> Unit = {},
-                   onItemLiked: (SakugaPost) -> Unit = {},
                    onItemDelete: (SakugaPost) -> Unit = {}) {
     val context = LocalContext.current
     val imageRequest = ImageRequest.Builder(context)
@@ -70,18 +70,25 @@ fun SakugaPostCard(post: SakugaPost,
         )
         IconButton(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .blur(radius = 0.1.dp),
+                .align(Alignment.BottomEnd),
             onClick = {
-                if (post.saved) onItemDelete(post) else onItemLiked(post)
+                if (post.saved) onItemDelete(post)
                 postSaved = !postSaved
                 post.saved = !post.saved
             }) {
-            Icon(
-                imageVector = if (postSaved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                tint = colorResource(id = R.color.heartIconTint),
-                contentDescription = stringResource(R.string.favourite_icon)
-            )
+            if (postSaved) {
+                Icon(
+                    Icons.Outlined.Favorite, contentDescription = "back",
+                    modifier = Modifier
+                        .blur(radius = 0.1.dp)
+                        .size(20.dp)
+                        .offset(35.dp, 10.dp), tint = Color(0, 0, 0, 40)
+                )
+                Icon(
+                    Icons.Outlined.Favorite, contentDescription = "front",
+                    modifier = Modifier.size(35.dp), tint = colorResource(id = R.color.heartIconTint)
+                )
+            }
         }
     }
 }

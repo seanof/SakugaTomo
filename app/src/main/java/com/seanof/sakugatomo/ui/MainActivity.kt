@@ -1,6 +1,7 @@
 package com.seanof.sakugatomo.ui
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -91,7 +92,7 @@ class MainActivity : ComponentActivity() {
                     mutableIntStateOf(0)
                 }
                 showTopBar = when (navBackStackEntry?.destination?.route) {
-                    ScreenRoute.Latest.route, ScreenRoute.Search.route, ScreenRoute.Liked.route, ScreenRoute.Popular.route -> true
+                    ScreenRoute.Latest.route, ScreenRoute.Search.route, ScreenRoute.Favourites.route, ScreenRoute.Popular.route -> true
                     else -> false
                 }
 
@@ -130,7 +131,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     },
                                     badge = {
-                                        if (item.route == ScreenRoute.Liked.route) Text(text = savedItems.size.toString())
+                                        if (item.route == ScreenRoute.Favourites.route) Text(text = savedItems.size.toString())
                                     },
                                     modifier = Modifier
                                         .padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -260,9 +261,20 @@ class MainActivity : ComponentActivity() {
                             padding = padding,
                             uiState = uiState,
                             savedPosts = savedItems,
-                            viewModel::setLikedPostsFromSavedPosts,
-                            viewModel::saveSakugaPost,
-                            viewModel::removeSakugaPost)
+                            sakugaTagsList = sakugaTagsList,
+                            likedPosts = viewModel::setLikedPostsFromSavedPosts,
+                            onItemLiked = viewModel::saveSakugaPost,
+                            onItemDelete = viewModel::removeSakugaPost
+                        )
+                    }
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    onBackInvokedDispatcher.registerOnBackInvokedCallback(100) {
+                        if (navController.currentBackStackEntry?.destination?.route?.contains("Player") == true) onBackPressedDispatcher.onBackPressed()
+                        else if (drawerState.isOpen) {
+                            scope.launch { drawerState.close() }
+                        } else finish()
                     }
                 }
             }

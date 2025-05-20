@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.leakcanary.android)
     testImplementation(libs.core.testing)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.material3)

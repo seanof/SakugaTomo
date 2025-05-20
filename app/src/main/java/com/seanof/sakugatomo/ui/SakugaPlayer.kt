@@ -12,6 +12,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +33,9 @@ import androidx.media3.ui.PlayerView
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.model.SakugaPost
+import com.seanof.sakugatomo.data.model.SakugaTag
+import com.seanof.sakugatomo.util.Const.SOURCE
+import com.seanof.sakugatomo.util.Const.UNKNOWN
 
 @Composable
 fun SakugaPlayer(
@@ -39,6 +43,7 @@ fun SakugaPlayer(
     uri: String,
     uiState: SakugaTomoViewModel.ScreenUiState,
     likedPosts: List<SakugaPost>,
+    sakugaTagsList: List<SakugaTag>,
     onItemLiked: (SakugaPost) -> Unit = {},
     onItemDelete: (SakugaPost) -> Unit = {}
 ) {
@@ -65,9 +70,19 @@ fun SakugaPlayer(
                         postSaved = true
                     }
                 }
+                var title = UNKNOWN
+                post?.tags?.split(" ")?.forEach {
+                        tag -> sakugaTagsList.forEach {
+                    if (it.name == tag) {
+                        if (it.type == 3) {
+                            if (it.name.isNotEmpty()) title = it.name
+                        }
+                    }
+                } }
 
                 VideoPlayer(uri)
                 Box(modifier = Modifier.fillMaxSize()) {
+                    if (title != UNKNOWN) Text(modifier = Modifier.align(Alignment.TopStart).padding(12.dp, 10.dp), text = "$SOURCE $title")
                     IconButton(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
