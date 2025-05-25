@@ -106,7 +106,7 @@ class SakugaTomoViewModelTest {
         // Assert: Collect the state and verify it contains the error message
         val emittedState = viewModel.uiState.first()
         assert(emittedState is SakugaTomoViewModel.ScreenUiState.Error)
-        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Error).errorMessage == errorMessage)
+        assert((emittedState as SakugaTomoViewModel.ScreenUiState.Error).errorMessage == DEFAULT_ERROR_MSG)
     }
 
     @Test
