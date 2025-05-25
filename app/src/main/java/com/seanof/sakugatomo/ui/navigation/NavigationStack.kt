@@ -1,5 +1,6 @@
 package com.seanof.sakugatomo.ui.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -19,25 +20,46 @@ fun NavigationStack(navHostController: NavHostController,
                     savedPosts: List<SakugaPost>,
                     likedPosts: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
                     sakugaTagsList: List<SakugaTag>,
+                    onSaveItemToDownloads: (Context, String, String) -> Unit,
                     onItemLiked: (SakugaPost) -> Unit = {},
                     onItemDelete: (SakugaPost) -> Unit = {}) {
+
+    val routes = listOf(
+        ScreenRoute.Latest,
+        ScreenRoute.Favourites,
+        ScreenRoute.Popular,
+        ScreenRoute.Search
+    )
+
     NavHost(navController = navHostController, startDestination = ScreenRoute.Latest.route) {
-        composable(route = ScreenRoute.Latest.route) {
-            SakugaItemsGrid(padding, uiState, savedPosts, ScreenRoute.Latest.route, likedPosts, { itemId -> navHostController.navigate(ScreenRoute.Player(itemId)) }, onItemDelete)
-        }
-        composable(route = ScreenRoute.Favourites.route) {
-            SakugaItemsGrid(padding, uiState, savedPosts, ScreenRoute.Favourites.route, likedPosts, { itemId -> navHostController.navigate(ScreenRoute.Player(itemId)) }, onItemDelete)
-        }
-        composable(route = ScreenRoute.Popular.route) {
-            SakugaItemsGrid(padding, uiState, savedPosts, ScreenRoute.Popular.route, likedPosts, { itemId -> navHostController.navigate(ScreenRoute.Player(itemId)) }, onItemDelete)
-        }
-        composable(route = ScreenRoute.Search.route) {
-            SakugaItemsGrid(padding, uiState, savedPosts, ScreenRoute.Search.route, likedPosts, { itemId -> navHostController.navigate(ScreenRoute.Player(itemId)) }, onItemDelete)
-        }
-        composable<ScreenRoute.Player> { backStackEntry ->
-            val itemUri = (backStackEntry.toRoute<ScreenRoute.Player>() as? ScreenRoute.Player)?.uri
-            itemUri?.let {
-                SakugaPlayer(padding, itemUri, uiState, savedPosts,sakugaTagsList, onItemLiked, onItemDelete)
+        routes.forEach { screenRoute ->
+            composable(route = screenRoute.route) {
+                SakugaItemsGrid(
+                    padding = padding,
+                    uiState = uiState,
+                    likedPosts = savedPosts,
+                    currentRoute = screenRoute.route,
+                    getLikedSakugaPost = likedPosts,
+                    onItemClick = { itemId -> navHostController.navigate(ScreenRoute.Player(itemId)) },
+                    onItemDelete = onItemDelete
+                )
+            }
+
+            composable<ScreenRoute.Player> { backStackEntry ->
+                val itemUri = (backStackEntry.toRoute<ScreenRoute.Player>() as? ScreenRoute.Player)?.uri
+                itemUri?.let {
+                    SakugaPlayer(
+                        navHostController = navHostController,
+                        padding = padding,
+                        uri = it,
+                        uiState = uiState,
+                        likedPosts = savedPosts,
+                        sakugaTagsList = sakugaTagsList,
+                        onSaveItemToDownloads = onSaveItemToDownloads,
+                        onItemLiked = onItemLiked,
+                        onItemDelete = onItemDelete
+                    )
+                }
             }
         }
     }

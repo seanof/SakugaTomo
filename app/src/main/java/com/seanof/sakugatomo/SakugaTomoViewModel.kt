@@ -1,5 +1,11 @@
 package com.seanof.sakugatomo
 
+import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.seanof.sakugatomo.data.db.SakugaPostRepository
@@ -10,8 +16,10 @@ import com.seanof.sakugatomo.data.remote.SakugaApiService
 import com.seanof.sakugatomo.util.Const.DEFAULT_ERROR_MSG
 import com.seanof.sakugatomo.util.Const.EMPTY
 import com.seanof.sakugatomo.util.Const.LATEST_FETCH_LIMIT
+import com.seanof.sakugatomo.util.Const.MIME_TYPE_VIDEO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +29,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URL
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,6 +114,35 @@ class SakugaTomoViewModel @Inject constructor(
 
     fun removeSakugaPost(sakugaPost: SakugaPost) {
         viewModelScope.launch { sakugaPostRepository.delete(sakugaPost) }
+    }
+
+    fun savePostToDownloads(context: Context, url: String, fileName: String) {
+        val videoCollection =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            } else {
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            }
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+            put(MediaStore.MediaColumns.MIME_TYPE, MIME_TYPE_VIDEO)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+        val resolver = context.contentResolver
+        val uri = resolver.insert(videoCollection, contentValues)
+        if (uri != null) {
+            Toast.makeText(context, context.getString(R.string.download_text), Toast.LENGTH_SHORT).show()
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    URL(url).openStream().use { input ->
+                        resolver.openOutputStream(uri).use { output ->
+                            input.copyTo(output!!, DEFAULT_BUFFER_SIZE)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Converts Flow into StateFlow for use in listing tags for SearchBar

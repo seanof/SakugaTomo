@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -186,6 +187,7 @@ class MainActivity : ComponentActivity() {
                                     if (currentRoute == ScreenRoute.Search.route) {
                                         var expanded by rememberSaveable { mutableStateOf(false) }
                                         SearchBar(
+                                            windowInsets = WindowInsets(top = 0.dp),
                                             modifier = Modifier
                                                 .align(Alignment.CenterHorizontally)
                                                 .background(MaterialTheme.colorScheme.background)
@@ -263,6 +265,7 @@ class MainActivity : ComponentActivity() {
                             savedPosts = savedItems,
                             sakugaTagsList = sakugaTagsList,
                             likedPosts = viewModel::setLikedPostsFromSavedPosts,
+                            onSaveItemToDownloads = viewModel::savePostToDownloads,
                             onItemLiked = viewModel::saveSakugaPost,
                             onItemDelete = viewModel::removeSakugaPost
                         )

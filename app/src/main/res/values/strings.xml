@@ -4,5 +4,10 @@
     <string name="search_via_tags">Search via tags</string>
     <string name="menu">Menu</string>
     <string name="refresh">Refresh</string>
+    <string name="source">Source: %1$s</string>
+    <string name="unknown">unknown</string>
+    <string name="back_icon">Back Icon</string>
     <string name="favourite_icon">Favourite Icon</string>
+    <string name="download_icon">Download Icon</string>
+    <string name="download_text">Saved to Downloads folder</string>
 </resources>

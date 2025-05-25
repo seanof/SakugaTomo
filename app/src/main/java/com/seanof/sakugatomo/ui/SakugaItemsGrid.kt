@@ -50,7 +50,7 @@ fun SakugaItemsGrid(
                     modifier = Modifier.size(50.dp),
                     color = colorResource(id = R.color.colorTint)
                 )
-                is SakugaTomoViewModel.ScreenUiState.Error -> Text(uiState.errorMessage)
+                is SakugaTomoViewModel.ScreenUiState.Error -> Text(modifier = Modifier.padding(10.dp), text = uiState.errorMessage)
                 is SakugaTomoViewModel.ScreenUiState.Success -> {
                     getLikedSakugaPost.invoke(uiState.posts, likedPosts)
                     val postList =

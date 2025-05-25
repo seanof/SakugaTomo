@@ -1,14 +1,20 @@
 package com.seanof.sakugatomo.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -25,28 +31,33 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavHostController
 import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.data.model.SakugaTag
-import com.seanof.sakugatomo.util.Const.SOURCE
-import com.seanof.sakugatomo.util.Const.UNKNOWN
+import com.seanof.sakugatomo.util.Const.SPACE
+import com.seanof.sakugatomo.util.Const.UNDERSCORE
 
 @Composable
 fun SakugaPlayer(
+    navHostController: NavHostController,
     padding: PaddingValues,
     uri: String,
     uiState: SakugaTomoViewModel.ScreenUiState,
     likedPosts: List<SakugaPost>,
     sakugaTagsList: List<SakugaTag>,
+    onSaveItemToDownloads: (Context, String, String) -> Unit,
     onItemLiked: (SakugaPost) -> Unit = {},
     onItemDelete: (SakugaPost) -> Unit = {}
 ) {
+    val context = LocalContext.current
     var postSaved by remember {
         mutableStateOf(false)
     }
@@ -70,38 +81,87 @@ fun SakugaPlayer(
                         postSaved = true
                     }
                 }
-                var title = UNKNOWN
-                post?.tags?.split(" ")?.forEach {
+                var title = stringResource(R.string.source)
+                post?.tags?.split(SPACE)?.forEach {
                         tag -> sakugaTagsList.forEach {
                     if (it.name == tag) {
                         if (it.type == 3) {
-                            if (it.name.isNotEmpty()) title = it.name
+                            if (it.name.isNotEmpty()) title = it.name.replace(UNDERSCORE, SPACE)
                         }
                     }
-                } }
-
-                VideoPlayer(uri)
-                Box(modifier = Modifier.fillMaxSize()) {
-                    if (title != UNKNOWN) Text(modifier = Modifier.align(Alignment.TopStart).padding(12.dp, 10.dp), text = "$SOURCE $title")
-                    IconButton(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .blur(radius = 0.1.dp),
-                        onClick = {
-                            if (post != null) {
-                                if (post.saved) onItemDelete(post) else onItemLiked(post)
-                                postSaved = !postSaved
-                                post.saved = !post.saved
-                            }
-                        }) {
-                        Icon(
-                            imageVector = if (postSaved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
-                            tint = colorResource(id = R.color.heartIconTint),
-                            contentDescription = stringResource(R.string.favourite_icon)
-                        )
-                    }
+                }
                 }
 
+                VideoPlayer(uri)
+                Row(
+                    modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            modifier = Modifier
+                                .blur(radius = 0.1.dp),
+                            onClick = {
+                                navHostController.popBackStack()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                tint = colorResource(id = R.color.colorTint),
+                                contentDescription = stringResource(R.string.back_icon)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.weight(0.7f),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            if (title != stringResource(R.string.unknown)) {
+                                Text(
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    text = stringResource(R.string.source, title)
+                                )
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.wrapContentWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(
+                                modifier = Modifier
+                                    .blur(radius = 0.1.dp),
+                                onClick = {
+                                    if (post != null) {
+                                        onSaveItemToDownloads(context, uri, uri.toString())
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.KeyboardArrowDown,
+                                    tint = colorResource(id = R.color.colorTint),
+                                    contentDescription = stringResource(R.string.download_icon)
+                                )
+                            }
+                            IconButton(
+                                modifier = Modifier
+                                    .blur(radius = 0.1.dp),
+                                onClick = {
+                                    if (post != null) {
+                                        if (post.saved) onItemDelete(post) else onItemLiked(post)
+                                        postSaved = !postSaved
+                                        post.saved = !post.saved
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (postSaved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder,
+                                    tint = colorResource(id = R.color.heartIconTint),
+                                    contentDescription = stringResource(R.string.favourite_icon)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
