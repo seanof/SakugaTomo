@@ -42,6 +42,7 @@ import com.seanof.sakugatomo.R
 import com.seanof.sakugatomo.SakugaTomoViewModel
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.data.model.SakugaTag
+import com.seanof.sakugatomo.util.Const.EMPTY
 import com.seanof.sakugatomo.util.Const.SPACE
 import com.seanof.sakugatomo.util.Const.UNDERSCORE
 
@@ -81,15 +82,21 @@ fun SakugaPlayer(
                         postSaved = true
                     }
                 }
-                var title = stringResource(R.string.source)
-                post?.tags?.split(SPACE)?.forEach {
-                        tag -> sakugaTagsList.forEach {
-                    if (it.name == tag) {
-                        if (it.type == 3) {
-                            if (it.name.isNotEmpty()) title = it.name.replace(UNDERSCORE, SPACE)
+                var title = stringResource(R.string.unknown)
+                if (post?.sourceTitle != EMPTY) title = post?.sourceTitle.toString()
+                else {
+                    post?.tags?.split(SPACE)?.forEach { tag ->
+                        sakugaTagsList.forEach {
+                            if (it.name == tag) {
+                                if (it.type == 3) {
+                                    if (it.name.isNotEmpty()) {
+                                        title = it.name.replace(UNDERSCORE, SPACE)
+                                        post.sourceTitle = title
+                                    }
+                                }
+                            }
                         }
                     }
-                }
                 }
 
                 VideoPlayer(uri)
@@ -115,7 +122,7 @@ fun SakugaPlayer(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start
                         ) {
-                            if (title != stringResource(R.string.unknown)) {
+                            if (title != stringResource(R.string.unknown) || title != EMPTY) {
                                 Text(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
