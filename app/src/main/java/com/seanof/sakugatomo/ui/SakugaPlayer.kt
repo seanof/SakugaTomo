@@ -85,7 +85,7 @@ fun SakugaPlayer(
                 var title = stringResource(R.string.unknown)
                 if (post?.sourceTitle != EMPTY) title = post?.sourceTitle.toString()
                 else {
-                    post?.tags?.split(SPACE)?.forEach { tag ->
+                    post.tags.split(SPACE).forEach { tag ->
                         sakugaTagsList.forEach {
                             if (it.name == tag) {
                                 if (it.type == 3) {
