@@ -12,18 +12,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import com.seanof.sakugatomo.ui.theme.ShimmerColors
+import com.seanof.sakugatomo.util.Const.EMPTY
 
 @Composable
 fun ShimmerAnimation(
 ) {
-    val transition = rememberInfiniteTransition(label = "")
+    val transition = rememberInfiniteTransition(label = EMPTY)
     val translateAnim by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             RepeatMode.Reverse
-        ), label = ""
+        ), label = EMPTY
     )
 
     val brush = Brush.linearGradient(

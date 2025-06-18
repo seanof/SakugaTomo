@@ -68,7 +68,7 @@ fun SakugaPlayer(
         when (uiState) {
             is SakugaTomoViewModel.ScreenUiState.Error, SakugaTomoViewModel.ScreenUiState.Loading -> { /* not needed */ }
             is SakugaTomoViewModel.ScreenUiState.Success -> {
-                val post = uiState.posts.find {
+                var post = uiState.posts.find {
                     it.file_url == uri
                 }
                 if (likedPosts.contains(post)) {
@@ -78,8 +78,7 @@ fun SakugaPlayer(
                 if (post == null) {
                     val likedPost = likedPosts.find { it.file_url == uri }
                     if (likedPost != null) {
-                        post?.saved = true
-                        postSaved = true
+                        post = likedPost
                     }
                 }
                 var title = stringResource(R.string.unknown)

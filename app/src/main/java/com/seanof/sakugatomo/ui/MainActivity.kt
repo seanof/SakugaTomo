@@ -63,6 +63,8 @@ import com.seanof.sakugatomo.ui.navigation.NavigationItem
 import com.seanof.sakugatomo.ui.navigation.NavigationStack
 import com.seanof.sakugatomo.ui.navigation.ScreenRoute
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
+import com.seanof.sakugatomo.util.Const.EMPTY
+import com.seanof.sakugatomo.util.Const.PLAYER
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -221,7 +223,7 @@ class MainActivity : ComponentActivity() {
                                                             Icons.Default.Clear,
                                                             contentDescription = null,
                                                             modifier = Modifier.clickable {
-                                                                viewModel.onSearchTextChange("")
+                                                                viewModel.onSearchTextChange(EMPTY)
                                                             })
                                                     }
                                                 )
@@ -274,7 +276,7 @@ class MainActivity : ComponentActivity() {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     onBackInvokedDispatcher.registerOnBackInvokedCallback(100) {
-                        if (navController.currentBackStackEntry?.destination?.route?.contains("Player") == true) onBackPressedDispatcher.onBackPressed()
+                        if (navController.currentBackStackEntry?.destination?.route?.contains(PLAYER) == true) onBackPressedDispatcher.onBackPressed()
                         else if (drawerState.isOpen) {
                             scope.launch { drawerState.close() }
                         } else finish()

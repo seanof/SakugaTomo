@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.seanof.sakugatomo.ui.theme.SakugaTomoTheme
+import com.seanof.sakugatomo.util.Const.EMPTY
 
 @Composable
 fun SearchableInput(
@@ -21,7 +22,10 @@ fun SearchableInput(
             value = searchText,
             onValueChange = onValueChange,
             singleLine = true,
-            leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "") },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = EMPTY
+            ) },
             placeholder = { Text(text = "Search via tags") }
         )
     }
@@ -31,7 +35,7 @@ fun SearchableInput(
 @Composable
 fun SearchableInputPreview() {
     SakugaTomoTheme {
-        SearchableInput("") {}
+        SearchableInput(EMPTY) {}
     }
 }
 
@@ -44,6 +48,6 @@ SearchableInput(searchText = search, onValueChange = {
         it
     )
 })
-var textFieldState by remember { mutableStateOf("") }
+var textFieldState by remember { mutableStateOf(EMPTY) }
  *
  **/

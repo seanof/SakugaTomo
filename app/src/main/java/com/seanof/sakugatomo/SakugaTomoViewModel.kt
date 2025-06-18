@@ -37,9 +37,12 @@ import javax.inject.Inject
 class SakugaTomoViewModel @Inject constructor(
     private val sakugaApiService: SakugaApiService,
     private val sakugaPostRepository: SakugaPostRepository,
-    private val defaultDispatcher: CoroutineDispatcher) : ViewModel() {
-    private val _searchText = MutableStateFlow("")
+    private val defaultDispatcher: CoroutineDispatcher
+) : ViewModel() {
+
+    private val _searchText = MutableStateFlow(EMPTY)
     val searchText = _searchText.asStateFlow()
+
     val savedSakugaPosts = sakugaPostRepository.sakugaPosts
 
     private val _uiState = MutableStateFlow<ScreenUiState>(ScreenUiState.Loading)
@@ -56,88 +59,66 @@ class SakugaTomoViewModel @Inject constructor(
         fetchSakugaPosts(FetchType.LATEST)
     }
 
-    fun fetchSakugaTags() {
-        viewModelScope.launch {
-            sakugaApiService.getSakugaTags()
-                .flowOn(defaultDispatcher)
-                .catch { it.printStackTrace() }
-                .collect {
-                    it.data?.let { tags -> sakugaPostRepository.insertTags(tags) }
-                }
-        }
+    fun fetchSakugaTags() = viewModelScope.launch {
+        sakugaApiService.getSakugaTags()
+            .flowOn(defaultDispatcher)
+            .catch { it.printStackTrace() }
+            .collect { it.data?.let { tags -> sakugaPostRepository.insertTags(tags) } }
     }
 
-    fun fetchSakugaPosts(fetchType: FetchType, tags: String = EMPTY) {
-        viewModelScope.launch {
-            when (fetchType) {
-                FetchType.LATEST ->  sakugaApiService.getSakugaPosts(LATEST_FETCH_LIMIT)
-                FetchType.POPULAR -> sakugaApiService.getPopularSakugaPosts()
-                FetchType.SEARCH -> sakugaApiService.searchSakugaPosts(tags)
-            }
-                .flowOn(defaultDispatcher)
-                .catch {
-                    _uiState.value = ScreenUiState.Error(it.message ?: DEFAULT_ERROR_MSG)
-                }
-                .collect { result ->
-                    when (result) {
-                        is SakugaApiResult.Success ->
-                            _uiState.value = ScreenUiState.Success(result.data ?: emptyList())
-
-                        is SakugaApiResult.Error ->
-                            _uiState.value = ScreenUiState.Error(result.error ?: DEFAULT_ERROR_MSG)
-
-                        is SakugaApiResult.Loading ->
-                            _uiState.value = ScreenUiState.Loading
-                    }
-                }
+    fun fetchSakugaPosts(fetchType: FetchType, tags: String = EMPTY) = viewModelScope.launch {
+        val flow = when (fetchType) {
+            FetchType.LATEST -> sakugaApiService.getSakugaPosts(LATEST_FETCH_LIMIT)
+            FetchType.POPULAR -> sakugaApiService.getPopularSakugaPosts()
+            FetchType.SEARCH -> sakugaApiService.searchSakugaPosts(tags)
         }
+
+        flow.flowOn(defaultDispatcher)
+            .catch {
+                _uiState.value = ScreenUiState.Error(it.message ?: DEFAULT_ERROR_MSG)
+            }
+            .collect { result ->
+                _uiState.value = when (result) {
+                    is SakugaApiResult.Success -> ScreenUiState.Success(result.data ?: emptyList())
+                    is SakugaApiResult.Error -> ScreenUiState.Error(result.error ?: DEFAULT_ERROR_MSG)
+                    is SakugaApiResult.Loading -> ScreenUiState.Loading
+                }
+            }
     }
 
     fun setLikedPostsFromSavedPosts(data: List<SakugaPost>?, dbList: List<SakugaPost>) {
-        viewModelScope.launch {
-            val listData = data?.toList()
-            for (dbItem in dbList) {
-                if (listData != null) {
-                    for (post in listData) {
-                        if (dbItem.id == post.id) {
-                            post.saved = true
-                        }
-                    }
-                }
-            }
-        }
+        val savedIds = dbList.map { it.id }.toSet()
+        data?.forEach { it.saved = it.id in savedIds }
     }
 
-    fun saveSakugaPost(sakugaPost: SakugaPost) {
-        viewModelScope.launch { sakugaPostRepository.insert(sakugaPost) }
+    fun saveSakugaPost(post: SakugaPost) = viewModelScope.launch {
+        sakugaPostRepository.insert(post)
     }
 
-    fun removeSakugaPost(sakugaPost: SakugaPost) {
-        viewModelScope.launch { sakugaPostRepository.delete(sakugaPost) }
+    fun removeSakugaPost(post: SakugaPost) = viewModelScope.launch {
+        sakugaPostRepository.delete(post)
     }
 
     fun savePostToDownloads(context: Context, url: String, fileName: String) {
-        val videoCollection =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            } else {
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            }
+        val videoCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        }
 
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
             put(MediaStore.MediaColumns.MIME_TYPE, MIME_TYPE_VIDEO)
             put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
-        val resolver = context.contentResolver
-        val uri = resolver.insert(videoCollection, contentValues)
-        if (uri != null) {
+
+        context.contentResolver.insert(videoCollection, contentValues)?.let { uri ->
             Toast.makeText(context, context.getString(R.string.download_text), Toast.LENGTH_SHORT).show()
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
                     URL(url).openStream().use { input ->
-                        resolver.openOutputStream(uri).use { output ->
-                            input.copyTo(output!!, DEFAULT_BUFFER_SIZE)
+                        context.contentResolver.openOutputStream(uri)?.use { output ->
+                            input.copyTo(output, DEFAULT_BUFFER_SIZE)
                         }
                     }
                 }
@@ -145,29 +126,25 @@ class SakugaTomoViewModel @Inject constructor(
         }
     }
 
-    // Converts Flow into StateFlow for use in listing tags for SearchBar
-    private val getAllSakugaTags: StateFlow<List<SakugaTag>> =
+    private val sakugaTags: StateFlow<List<SakugaTag>> =
         sakugaPostRepository.sakugaTags
-            .catch { exception -> exception.printStackTrace() }
+            .catch { it.printStackTrace() }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val _sakugaTagsList = getAllSakugaTags
-    val sakugaTagsList = searchText
-        .combine(_sakugaTagsList) { text, sakugaTags ->
-            sakugaTags.filter { sakugaTag ->
-                sakugaTag.name.uppercase().contains(text.trim().uppercase())
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = _sakugaTagsList.value
-        )
+    val sakugaTagsList: StateFlow<List<SakugaTag>> = searchText
+        .combine(sakugaTags) { text, tags ->
+            val query = text.trim().uppercase()
+            tags.filter { it.name.uppercase().contains(query) }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(TAG_LIST_TIMEOUT), emptyList())
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text
     }
 
-    enum class FetchType {
-        LATEST, POPULAR, SEARCH
+    enum class FetchType { LATEST, POPULAR, SEARCH }
+
+    private companion object {
+        const val TAG_LIST_TIMEOUT = 5000L
     }
 }
