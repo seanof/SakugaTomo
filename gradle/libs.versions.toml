@@ -1,27 +1,28 @@
 [versions]
-agp = "8.10.0"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.10.1"
+kotlin = "2.0.21"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.01.01"
-hilt = "2.48"
+lifecycleRuntimeKtx = "2.9.1"
+activityCompose = "1.10.1"
+composeBom = "2025.06.01"
+hilt = "2.56.2"
 coilCompose = "2.7.0"
 ktor = "3.0.0-beta-2"
 ktor-logging = "2.3.2"
-room = "2.6.1"
-media3 = "1.5.1"
+room = "2.7.2"
+media3 = "1.7.1"
 mockitoCore = "5.14.2"
 inline = "2.20.0"
 mockitoAndroid = "5.14.2"
 kotlinxCoroutinesTest = "1.9.0"
 coreTesting = "1.1.1"
-navigationCompose = "2.8.6"
-coreSplashscreen = "1.2.0-alpha02"
+navigationCompose = "2.9.0"
+coreSplashscreen = "1.2.0-beta02"
 leakcanaryAndroid = "3.0-alpha-8"
+firebase = "33.15.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,8 +60,12 @@ core-testing = { group = "android.arch.core", name = "core-testing", version.ref
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 leakcanary-android = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanaryAndroid" }
+firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

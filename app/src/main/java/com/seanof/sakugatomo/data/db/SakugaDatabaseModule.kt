@@ -19,7 +19,7 @@ object SakugaDatabaseModule {
             context,
             SakugaTomoAppDatabase::class.java,
             "sakugaTomoAppDatabase"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Singleton
