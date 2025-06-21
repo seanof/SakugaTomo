@@ -44,6 +44,7 @@ class SakugaTomoViewModel @Inject constructor(
     val searchText = _searchText.asStateFlow()
 
     val savedSakugaPosts = sakugaPostRepository.sakugaPosts
+    val sakugaTags = sakugaPostRepository.sakugaTags
 
     private val _uiState = MutableStateFlow<ScreenUiState>(ScreenUiState.Loading)
     val uiState: StateFlow<ScreenUiState> = _uiState.asStateFlow()
@@ -126,13 +127,13 @@ class SakugaTomoViewModel @Inject constructor(
         }
     }
 
-    private val sakugaTags: StateFlow<List<SakugaTag>> =
+    private val sakugaTagsList: StateFlow<List<SakugaTag>> =
         sakugaPostRepository.sakugaTags
             .catch { it.printStackTrace() }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val sakugaTagsList: StateFlow<List<SakugaTag>> = searchText
-        .combine(sakugaTags) { text, tags ->
+    val searchedSakugaTags: StateFlow<List<SakugaTag>> = searchText
+        .combine(sakugaTagsList) { text, tags ->
             val query = text.trim().uppercase()
             tags.filter { it.name.uppercase().contains(query) }
         }

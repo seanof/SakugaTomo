@@ -85,7 +85,8 @@ class MainActivity : ComponentActivity() {
                 val savedItems = viewModel.savedSakugaPosts.collectAsStateWithLifecycle(initialValue = listOf()).value
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val searchText by viewModel.searchText.collectAsStateWithLifecycle()
-                val sakugaTagsList by viewModel.sakugaTagsList.collectAsStateWithLifecycle()
+                val sakugaTags by viewModel.sakugaTags.collectAsStateWithLifecycle(initialValue = listOf())
+                val searchedSakugaTags by viewModel.searchedSakugaTags.collectAsStateWithLifecycle()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -237,7 +238,7 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier
                                                     .semantics { traversalIndex = 1f },
                                             ) {
-                                                items(sakugaTagsList) {
+                                                items(searchedSakugaTags) {
                                                     Text(
                                                         text = it.name,
                                                         modifier = Modifier
@@ -265,7 +266,7 @@ class MainActivity : ComponentActivity() {
                             padding = padding,
                             uiState = uiState,
                             savedPosts = savedItems,
-                            sakugaTagsList = sakugaTagsList,
+                            sakugaTagsList = sakugaTags,
                             likedPosts = viewModel::setLikedPostsFromSavedPosts,
                             onSaveItemToDownloads = viewModel::savePostToDownloads,
                             onItemLiked = viewModel::saveSakugaPost,
