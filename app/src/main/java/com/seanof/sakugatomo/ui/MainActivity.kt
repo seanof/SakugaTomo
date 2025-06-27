@@ -87,6 +87,7 @@ class MainActivity : ComponentActivity() {
                 val searchText by viewModel.searchText.collectAsStateWithLifecycle()
                 val sakugaTags by viewModel.sakugaTags.collectAsStateWithLifecycle(initialValue = listOf())
                 val searchedSakugaTags by viewModel.searchedSakugaTags.collectAsStateWithLifecycle()
+                val gesturesEnabled by viewModel.gesturesEnabled.collectAsStateWithLifecycle()
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -102,6 +103,7 @@ class MainActivity : ComponentActivity() {
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
+                    gesturesEnabled = gesturesEnabled,
                     drawerContent = {
                         ModalDrawerSheet {
                             Spacer(modifier = Modifier.height(16.dp))
@@ -144,7 +146,6 @@ class MainActivity : ComponentActivity() {
 
                         }
                     },
-                    gesturesEnabled = true
                 ) {
                     Scaffold(
                         topBar = {
@@ -189,6 +190,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     if (currentRoute == ScreenRoute.Search.route) {
                                         var expanded by rememberSaveable { mutableStateOf(false) }
+                                        drawerState
                                         SearchBar(
                                             windowInsets = WindowInsets(top = 0.dp),
                                             modifier = Modifier
@@ -267,6 +269,7 @@ class MainActivity : ComponentActivity() {
                             uiState = uiState,
                             savedPosts = savedItems,
                             sakugaTagsList = sakugaTags,
+                            gesturesEnabled = viewModel::setGesturesEnabled,
                             likedPosts = viewModel::setLikedPostsFromSavedPosts,
                             onSaveItemToDownloads = viewModel::savePostToDownloads,
                             onItemLiked = viewModel::saveSakugaPost,

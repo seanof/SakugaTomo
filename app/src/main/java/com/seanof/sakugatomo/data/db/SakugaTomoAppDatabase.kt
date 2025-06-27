@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.seanof.sakugatomo.data.model.SakugaPost
 import com.seanof.sakugatomo.data.model.SakugaTag
 
-@Database(entities = [SakugaPost::class, SakugaTag::class], version = 5, exportSchema = false)
+@Database(entities = [SakugaPost::class, SakugaTag::class], version = 6, exportSchema = false)
 abstract class SakugaTomoAppDatabase : RoomDatabase() {
     abstract fun sakugaPostDao(): SakugaPostDao
 }

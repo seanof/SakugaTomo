@@ -49,6 +49,9 @@ class SakugaTomoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ScreenUiState>(ScreenUiState.Loading)
     val uiState: StateFlow<ScreenUiState> = _uiState.asStateFlow()
 
+    private val _gesturesEnabled = MutableStateFlow(true)
+    val gesturesEnabled = _gesturesEnabled.asStateFlow()
+
     sealed class ScreenUiState {
         data object Loading : ScreenUiState()
         data class Error(val errorMessage: String) : ScreenUiState()
@@ -98,6 +101,10 @@ class SakugaTomoViewModel @Inject constructor(
 
     fun removeSakugaPost(post: SakugaPost) = viewModelScope.launch {
         sakugaPostRepository.delete(post)
+    }
+
+    fun setGesturesEnabled(isEnabled: Boolean) {
+        _gesturesEnabled.value = isEnabled
     }
 
     fun savePostToDownloads(context: Context, url: String, fileName: String) {

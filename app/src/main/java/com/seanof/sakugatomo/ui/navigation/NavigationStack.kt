@@ -14,15 +14,18 @@ import com.seanof.sakugatomo.ui.SakugaItemsGrid
 import com.seanof.sakugatomo.ui.SakugaPlayer
 
 @Composable
-fun NavigationStack(navHostController: NavHostController,
-                    padding: PaddingValues,
-                    uiState: SakugaTomoViewModel.ScreenUiState,
-                    savedPosts: List<SakugaPost>,
-                    likedPosts: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
-                    sakugaTagsList: List<SakugaTag>,
-                    onSaveItemToDownloads: (Context, String, String) -> Unit,
-                    onItemLiked: (SakugaPost) -> Unit = {},
-                    onItemDelete: (SakugaPost) -> Unit = {}) {
+fun NavigationStack(
+    navHostController: NavHostController,
+    padding: PaddingValues,
+    uiState: SakugaTomoViewModel.ScreenUiState,
+    savedPosts: List<SakugaPost>,
+    likedPosts: (List<SakugaPost>?, List<SakugaPost>) -> Unit,
+    sakugaTagsList: List<SakugaTag>,
+    onSaveItemToDownloads: (Context, String, String) -> Unit,
+    onItemLiked: (SakugaPost) -> Unit = {},
+    onItemDelete: (SakugaPost) -> Unit = {},
+    gesturesEnabled: (Boolean) -> Unit
+) {
 
     val routes = listOf(
         ScreenRoute.Latest,
@@ -34,6 +37,7 @@ fun NavigationStack(navHostController: NavHostController,
     NavHost(navController = navHostController, startDestination = ScreenRoute.Latest.route) {
         routes.forEach { screenRoute ->
             composable(route = screenRoute.route) {
+                gesturesEnabled(true)
                 SakugaItemsGrid(
                     padding = padding,
                     uiState = uiState,
@@ -47,6 +51,7 @@ fun NavigationStack(navHostController: NavHostController,
 
             composable<ScreenRoute.Player> { backStackEntry ->
                 val itemUri = (backStackEntry.toRoute<ScreenRoute.Player>() as? ScreenRoute.Player)?.uri
+                gesturesEnabled(false)
                 itemUri?.let {
                     SakugaPlayer(
                         navHostController = navHostController,
