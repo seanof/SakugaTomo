@@ -3,6 +3,7 @@ package com.seanof.sakugatomo.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavHostController
@@ -174,6 +175,7 @@ fun SakugaPlayer(
     }
 }
 
+@OptIn(UnstableApi::class)
 @SuppressLint("InflateParams")
 @Composable
 fun VideoPlayer(uri: String) {
@@ -201,6 +203,8 @@ fun VideoPlayer(uri: String) {
                 clipToOutline = true
                 player = exoPlayer
                 useController = true
+                setShowNextButton(false)
+                setShowPreviousButton(false)
             }
             return@AndroidView view
         }
